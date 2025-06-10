@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from core.post import PostService
-from models.post import PostModel
+from models.post import PostModel, PostModelWithoutId
 
 router = APIRouter()
 
@@ -11,7 +11,7 @@ async def get(id_: str):
     return await PostService.get_by_id(id_=id_)
 
 @router.post("/posts", tags=["/posts"])
-async def post(post: PostModel):
+async def post(post: PostModelWithoutId):
     return await PostService.add_post(post)
 
 @router.patch("/posts", tags=["/posts"])
