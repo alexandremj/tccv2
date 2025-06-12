@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from web3 import Web3
 
 from models.post import PostModel, PostUserContent
@@ -33,17 +35,28 @@ class BlockchainPostContract:
 
     def get_post_by_id(self, post_id: str) -> PostModel:
         post_data = self.deployed_contract.functions.getPost(int(post_id)).call()
+        date_format = "%Y-%m-%d %H:%M:%S"
         return PostModel(
             id=str(post_data[0]),
             user=post_data[1],
             content=post_data[2],
             active=post_data[3],
+            creation_time=datetime.fromtimestamp(post_data[4]).strftime(date_format),
+            update_time=datetime.fromtimestamp(post_data[5]).strftime(date_format),
         )
 
     def get_all_posts(self) -> list[PostModel]:
         posts = self.deployed_contract.functions.getPosts().call()
+        date_format = "%Y-%m-%d %H:%M:%S"
         return [
-            PostModel(id=str(post[0]), user=post[1], content=post[2], active=post[3])
+            PostModel(
+                id=str(post[0]),
+                user=post[1],
+                content=post[2],
+                active=post[3],
+                creation_time=datetime.fromtimestamp(post[4]).strftime(date_format),
+                update_time=datetime.fromtimestamp(post[5]).strftime(date_format),
+            )
             for post in posts
         ]
 

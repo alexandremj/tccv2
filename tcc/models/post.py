@@ -13,6 +13,8 @@ class PostModel(BaseModel):
     user: str
     content: bytes
     active: bool | None = True
+    creation_time: str | None = None
+    update_time: str | None = None
 
 
 class PostUpdateModel(BaseModel):
