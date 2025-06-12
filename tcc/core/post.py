@@ -3,8 +3,14 @@ from web3.exceptions import ContractLogicError
 
 from core.base import BaseService
 from core.blockchain import BlockchainRepository
+from core.content_parser import ContentParser
 from core.users import UserService
-from models.post import PostContent, PostModel, PostUpdateModel, PostUserContent
+from models.post import (
+    PostContent,
+    PostModel,
+    PostUpdateModel,
+    PostUserContent,
+)
 
 
 class PostService(BaseService):
@@ -26,8 +32,9 @@ class PostService(BaseService):
     @classmethod
     async def add_post(cls, user: str, post: PostContent) -> int:
         user = await UserService().get_by_email(user)
+        parsed_content = await ContentParser(post.content).parse()
         return BlockchainRepository.instance().posts.create_post(
-            PostUserContent(user=user.id, content=post.content)
+            PostUserContent(user=user.id, content=parsed_content)
         )
 
     @classmethod
@@ -39,9 +46,12 @@ class PostService(BaseService):
             raise HTTPException(
                 status_code=403, detail="You are not allowed to update this post."
             )
+
         if post.content is not None:
+            parsed_content = await ContentParser(post.content).parse()
             return (
                 BlockchainRepository()
                 .instance()
-                .posts.update_post_content(post.id, post.content)
+                .posts.update_post_content(post.id, parsed_content)
             )
+        return BlockchainRepository().instance().posts.get_post_by_id(post.id)
