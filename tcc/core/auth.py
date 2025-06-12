@@ -1,9 +1,9 @@
-import bcrypt
-from datetime import datetime, timedelta, timezone
 import os
+from datetime import datetime, timedelta, timezone
 
+import bcrypt
 import jwt
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
 JWT_SECRET_KEY = os.getenv("SECRET_KEY")
@@ -35,9 +35,9 @@ def decode_jwt(token: str) -> dict:
     try:
         return jwt.decode(token, JWT_SECRET_KEY, algorithms=["HS256"])
     except jwt.ExpiredSignatureError:
-        raise ValueError("Token has expired")
+        raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.InvalidTokenError:
-        raise ValueError("Invalid token")
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 def create_access_token(data: dict) -> str:
     """Create a JWT access token."""

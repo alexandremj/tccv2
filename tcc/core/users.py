@@ -1,10 +1,12 @@
 import asyncio
+import uuid
 
 from fastapi import HTTPException
-from core.base import BaseService
-from models.user import User
 
+from core.auth import hash_password
+from core.base import BaseService
 from db.connect import connect_db
+from models.user import User, UserProfileInfo
 
 
 class UserService(BaseService):
@@ -39,15 +41,32 @@ class UserService(BaseService):
                 return User(**user)
 
     @classmethod
-    async def add_user(cls, user: dict) -> int:
+    async def add_user(cls, user: UserProfileInfo) -> dict[str, str]:
         """Add a new user."""
-        return await cls.repository.users.create_user(user)
+        with connect_db() as connection:
+            with connection.cursor() as db:
+                # Check if user already exists
+                db.execute("SELECT * FROM users WHERE email = %s", (user.email,))
+                existing_user = db.fetchone()
+                if existing_user:
+                    raise HTTPException(
+                        status_code=400, detail="User with this email already exists."
+                    )
 
-    @classmethod
-    async def delete_user(cls, id_: str):
-        """Delete a user by ID."""
-        return await cls.repository.users.delete_user(id_)
+                generated_id = str(uuid.uuid4())
+                hashed_password = hash_password(user.password).decode("utf-8")
 
+                # Insert new user
+                db.execute(
+                    "INSERT INTO users (id, email, password, identification) VALUES (%s, %s, %s, %s)",
+                    (
+                        generated_id,
+                        user.email,
+                        hashed_password,
+                        user.identification,
+                    ),
+                )
+                return {"id": generated_id}
 
 if __name__ == "__main__":
     user_service = UserService()

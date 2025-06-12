@@ -55,9 +55,6 @@ class BlockchainPostContract:
         self.w3.eth.wait_for_transaction_receipt(tx_hash)
         return self.get_post_by_id(post_id)
 
-    # todo[alexandremj]: continue from here, implementing update and delete
-
-
 class BlockchainRepository:
     _instance = None
 
