@@ -23,13 +23,13 @@ tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
 print("✅ Contract deployed at:", tx_receipt.contractAddress)
 
 contract = w3.eth.contract(address=tx_receipt.contractAddress, abi=abi)
-breakpoint()
+
 print("Create post")
 tx_hash = contract.functions.createPost(creator_id, content).transact()
 print("Returned hash:", tx_hash)
 receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
 post_id = contract.events.PostCreated().process_receipt(receipt)[0]['args']['postId']
-breakpoint()
+
 # print("Initial value:", contract.functions.getContent().call())
 # contract.functions.setContent("Goodbye, cruel world").transact()
 # print("Updated value:", contract.functions.getContent().call())

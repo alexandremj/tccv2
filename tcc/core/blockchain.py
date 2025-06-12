@@ -1,6 +1,6 @@
 from web3 import Web3
 
-from models.post import PostModel, PostModelWithoutId
+from models.post import PostModel, PostUserContent
 from scripts.deploy import compile_contract
 
 BLOCKCHAIN_URL = "http://127.0.0.1:8545"
@@ -22,7 +22,7 @@ class BlockchainPostContract:
             address=self.tx_receipt.contractAddress, abi=abi
         )
 
-    def create_post(self, post: PostModelWithoutId) -> int:
+    def create_post(self, post: PostUserContent) -> int:
         tx_hash = self.deployed_contract.functions.createPost(post.user, post.content).transact()
         receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
         return self.deployed_contract.events.PostCreated().process_receipt(receipt)[0]["args"][

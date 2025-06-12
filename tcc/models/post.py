@@ -9,3 +9,11 @@ class PostModelWithoutId(BaseModel):
 class PostModel(BaseModel):
     # todo: user should be a reference to the creator of the post
     id: str
+
+class PostUserContent(BaseModel):
+    user: str
+    content: str
+
+
+class PostContent(BaseModel):
+    content: str

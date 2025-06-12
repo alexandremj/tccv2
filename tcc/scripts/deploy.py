@@ -12,8 +12,6 @@ def compile_contract():
     with open("./contracts/post.sol", "r") as f:
         test_contract = f.read()
 
-    breakpoint()
-
     compiled_sol = compile_standard({
         "language": "Solidity",
         "sources": {
@@ -44,3 +42,8 @@ def compile_contract():
 
 def deploy_contract(abi, bytecode):
     ...
+
+
+if __name__ == "__main__":
+    compile_contract()
+    deploy_contract(abi, bytecode)

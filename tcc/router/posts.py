@@ -1,7 +1,11 @@
 from fastapi import APIRouter
 
+from core.auth import get_current_user
 from core.post import PostService
-from models.post import PostModel, PostModelWithoutId
+from models.post import PostContent, PostModel
+
+from typing_extensions import Annotated
+from fastapi import Depends
 
 router = APIRouter()
 
@@ -11,8 +15,8 @@ async def get(id_: str):
     return await PostService.get_by_id(id_=id_)
 
 @router.post("/posts", tags=["/posts"])
-async def post(post: PostModelWithoutId):
-    return await PostService.add_post(post)
+async def post(post: PostContent, token: Annotated[str, Depends(get_current_user)]):
+    return await PostService.add_post(token["username"], post)
 
 @router.patch("/posts", tags=["/posts"])
 async def put(id_: str, post: PostModel):
