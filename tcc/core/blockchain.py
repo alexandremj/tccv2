@@ -23,22 +23,44 @@ class BlockchainPostContract:
         )
 
     def create_post(self, post: PostUserContent) -> int:
-        tx_hash = self.deployed_contract.functions.createPost(post.user, post.content).transact()
+        tx_hash = self.deployed_contract.functions.createPost(
+            post.user, post.content
+        ).transact()
         receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
-        return self.deployed_contract.events.PostCreated().process_receipt(receipt)[0]["args"][
-            "postId"
-        ]
+        return self.deployed_contract.events.PostCreated().process_receipt(receipt)[0][
+            "args"
+        ]["postId"]
 
     def get_post_by_id(self, post_id: str) -> PostModel:
         post_data = self.deployed_contract.functions.getPost(int(post_id)).call()
         return PostModel(
-            id=post_id, user=post_data[0], content=post_data[1], active=post_data[2]
+            id=str(post_data[0]),
+            user=post_data[1],
+            content=post_data[2],
+            active=post_data[3],
         )
-    
+
+    def get_all_posts(self) -> list[PostModel]:
+        posts = self.deployed_contract.functions.getPosts().call()
+        return [
+            PostModel(id=str(post[0]), user=post[1], content=post[2], active=post[3])
+            for post in posts
+        ]
+
+    def update_post_content(self, post_id: str, content: str) -> PostModel:
+        _id = int(post_id)
+        tx_hash = self.deployed_contract.functions.setPostContent(
+            _id, content
+        ).transact()
+        self.w3.eth.wait_for_transaction_receipt(tx_hash)
+        return self.get_post_by_id(post_id)
+
     # todo[alexandremj]: continue from here, implementing update and delete
 
 
-class _BlockchainRepository:
+class BlockchainRepository:
+    _instance = None
+
     def __init__(self):
         self.w3 = w3()
         if not self.w3.is_connected():
@@ -48,5 +70,8 @@ class _BlockchainRepository:
 
         self.posts = BlockchainPostContract(*compile_contract())
 
-# singleton quick implementation
-BlockchainRepository = _BlockchainRepository()
+    @classmethod
+    def instance(cls):
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance

@@ -29,11 +29,15 @@ contract Chain {
         emit PostCreated(_postId);
     }
 
-    function getPost(uint128 _id) public view returns (string memory, string memory, bool) {
+    function getPost(uint128 _id) public view returns (uint128 id, string memory, string memory, bool) {
         require(_id < posts.length, "Post does not exist");
 
         Post storage post = posts[_id];
-        return (post.creatorId, post.content, post.active);
+        return (post.id, post.creatorId, post.content, post.active);
+    }
+
+    function getPosts() external view returns (Post[] memory) {
+        return posts;
     }
 
     function activatePost(uint128 _id) public {

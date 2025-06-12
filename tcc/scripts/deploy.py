@@ -46,4 +46,4 @@ def deploy_contract(abi, bytecode):
 
 if __name__ == "__main__":
     compile_contract()
-    deploy_contract(abi, bytecode)
+    # deploy_contract(abi, bytecode)
