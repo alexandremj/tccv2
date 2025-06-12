@@ -4,7 +4,6 @@ from web3.exceptions import ContractLogicError
 from core.base import BaseService
 from core.blockchain import BlockchainRepository
 from core.users import UserService
-from db.db import DB
 from models.post import PostContent, PostModel, PostUpdateModel, PostUserContent
 
 
@@ -46,7 +45,3 @@ class PostService(BaseService):
                 .instance()
                 .posts.update_post_content(post.id, post.content)
             )
-
-    @classmethod
-    async def delete_post(cls, id_: str):
-        return await DB().delete_post(id_)

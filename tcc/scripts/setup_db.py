@@ -1,5 +1,6 @@
 from db.connect import connect_db
 
+
 def run_ddl():
     print("Running DDL to create tables...")
     queries = [
