@@ -9,7 +9,7 @@ class PostModelWithoutId(BaseModel):
 
 
 class PostModel(BaseModel):
-    id: str
+    identifier: str
     user: str
     content: bytes
     active: bool | None = True
@@ -30,3 +30,7 @@ class PostUserContent(BaseModel):
 
 class PostContent(BaseModel):
     content: UploadFile | None = None
+
+class PostContentVersions(BaseModel):
+    current: PostModel
+    previous: list[PostModel] = []

@@ -42,7 +42,7 @@ class PostService(BaseService):
         commited_post = await cls.get_by_id(post.id)
         user = await UserService().get_by_email(user_email)
 
-        if commited_post.user != user.id:
+        if commited_post.current.user != user.id:
             raise HTTPException(
                 status_code=403, detail="You are not allowed to update this post."
             )
